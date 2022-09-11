@@ -1,0 +1,56 @@
+#!/usr/bin/python3
+"""
+Given a list of YouTube URLs and their final names, download them as MP3,
+rename them, and edit their eyeD3 data
+
+The file given as the only argument is in the following format (empty lines are optional)
+
+```
+https://url1/
+Title 1
+
+https://url2/
+Title 2
+```
+"""
+
+from dataclasses import dataclass
+import sys
+import subprocess
+from typing import List
+
+youtube_dl_bin = "/usr/bin/yt-dlp"
+id3_cmd = "id3"
+ydl_opts = ["--no-playlist", "--extract-audio", "--audio-format", "mp3"]
+
+
+@dataclass
+class Target:
+    url: str
+    filename: str
+
+
+def get_targets_from_file(file: str) -> List[Target]:
+    """Get targets (URL & file names) from a text file"""
+    targets = []
+    with open(file, "r", encoding="utf8") as f:
+        lines = [line.strip() for line in f.readlines() if not line.isspace() and not line.startswith("#")]
+    for i in range(0, len(lines), 2):
+        targets.append(Target(lines[i], lines[i + 1]))
+    return targets
+
+
+def download_targets(targets: List[Target]) -> None:
+    """Download, rename, and edit the eyeD3 data of targets"""
+    for target in targets:
+        print(f'[*] Downloading "{target.filename}" from "{target.url}"')
+        args = [youtube_dl_bin]
+        args.append(target.url)
+        args.extend(ydl_opts)
+        args.extend(["--output", f"{target.filename}.%(ext)s"])
+        subprocess.call(args)
+        subprocess.call([id3_cmd, target.filename + ".mp3"])
+
+
+if __name__ == "__main__":
+    download_targets(get_targets_from_file(sys.argv[1]))

@@ -1,0 +1,8 @@
+#!/bin/bash
+# highlights strings given as arguments in stdin
+
+read -r txt
+for str in "$@"; do
+  txt="$(echo "$txt" | sed "s/${str}/\\o033[1;31m${str}\\o033[0m/")"
+done
+echo "$txt"

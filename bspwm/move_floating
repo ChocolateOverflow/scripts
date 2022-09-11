@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# This moves & snaps a floating window into position 1-9 on a 3x3 grid
+#
+# Usage:
+# 	move_floating SECTIONS_HORIZONTAL SECTIONS_VERTICAL POSITION
+# 	move_floating SECTIONS_HORIZONTAL SECTIONS_VERTICAL POS_H POS_V
+
+# Number of sections
+sections_x=$1
+sections_y=$2
+
+# Offset (for bars)
+offset_top=20
+offset_bottom=0
+offset_left=0
+offset_right=0
+
+# Padding (per window)
+padding_top=10
+padding_bottom=10
+padding_left=10
+padding_right=10
+
+# Horizontal & Vertical size (per window)
+x=$(( ($(xdpyinfo | grep "dimension" | cut -d" " -f7 | cut -d"x" -f1) - (offset_left + offset_right))/sections_x ))
+y=$(( ($(xdpyinfo | grep "dimension" | cut -d" " -f7 | cut -d"x" -f2) - (offset_top + offset_bottom))/sections_y ))
+
+# Make floating
+bspc node focused -t floating
+
+xdo resize \
+	-w $(( x - (padding_left + padding_right) / sections_x )) \
+	-h $(( y - (padding_top + padding_bottom) / sections_y ))
+
+# 3 arguments -> position in X*Y grid
+if [ $# = 3 ]; then
+	# Position in grid
+	pos=$3
+	xdo move \
+		-x $(( (((pos - 1) % sections_x) * x) + ( (padding_left - padding_right) / sections_x) + offset_left - offset_right )) \
+		-y $(( (((pos - 1) / sections_y) * y) + ( (padding_top - padding_bottom) / sections_y) + offset_top - offset_bottom ))
+elif [ $# = 4 ]; then
+	# X,Y positions
+	xdo move \
+		-x $(( (($3 - 1) * x) + offset_left - offset_right )) \
+		-y $(( (($4 - 1) * y) + offset_top - offset_bottom ))
+fi

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+out_dir="${HOME}/Videos/"
+out_file="$out_dir/$(date +%Y-%m-%d_%H-%M-%S).mp4"
+
+[ -d "$out_dir" ] || mkdir -p "$out_dir"
+
+ffmpeg -y \
+  -f x11grab \
+  -s "$("xdpyinfo |" grep dimensions | awk '{print $2;}')" \
+  -i :0.0 \
+  -c:v libx264 -r 30 \
+  "$out_file" \
+  && notify-send "Saved screencast to ($out_file)"

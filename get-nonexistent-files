@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# This script does stuff (e.g. create) with non-existent files
+# Usage:
+# 1. create symlink to `get-nonexistent-files`
+# 2. add symlink name to "do stuff" cases
+
+cmd="$(basename "$0")"
+if [ $# -lt 2 ]; then
+  echo "Usage: $cmd dirs... file"
+  exit 1
+fi
+
+# Filters out existing files
+args=("$@")
+filename_to_create="${args[$(($# - 1))]}"
+files=()
+for i in $(seq 0 $(($# - 2))); do
+  f="${args[i]}/$filename_to_create"
+  if [ ! -e "$f" ] && [ -d "${args[i]}" ];then
+    files+=("$f")
+  fi
+done
+
+# exit if no file to be created
+if [ ${#files[@]} -eq 0 ]; then
+  echo "[!] No file to create" 1>&2
+  exit 0
+fi
+
+# do stuff with the non-existent files
+case "$cmd" in
+  get-nonexistent-files) # just print files line by line
+    for f in "${files[@]}"; do
+      echo "$f"
+    done
+    ;;
+  ec) $EDITOR "${files[@]}";; # edit files
+esac

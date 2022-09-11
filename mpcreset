@@ -1,0 +1,6 @@
+#!/bin/sh
+
+mpc update
+mpc clear
+mpc add /
+mpc play

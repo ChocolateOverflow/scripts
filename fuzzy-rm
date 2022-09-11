@@ -1,0 +1,29 @@
+#!/bin/bash
+# fuzzy find rm multiple things in the current dir
+# Usage: fuzzy-rm [max-depth]
+
+if [ "$1" = "" ]; then
+  depth=1
+elif [ "$1" -ge 1 ] 2>/dev/null; then
+  depth="$1"
+else
+  echo "First argument must be empty or a positive integer but got '$1'" >&2
+  exit 1
+fi
+
+mapfile -t targets < <(fd -d "$depth" -L --hidden --strip-cwd-prefix | fzf -m)
+
+len="${#targets[@]}"
+[ "$len" -eq 0 ] && exit 1 # exit with error if fzf was cancelled
+
+file "${targets[@]}" # show file types for manual checking
+
+while true; do
+  echo
+  read -rp "Delete $len items (y/n)?   " confirmation
+  case "$confirmation" in
+    y|Y) rm -rf "${targets[@]}"; break;;
+    n|N) echo "aborted"; exit 1;;
+    *) echo "Invalid choice: '$confirmation'";;
+  esac
+done

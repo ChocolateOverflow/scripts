@@ -1,0 +1,2 @@
+#!/bin/bash
+rg --color='auto' -Pn "[^\x00-\x7F]" "$@"

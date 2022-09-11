@@ -1,0 +1,15 @@
+#!/bin/bash
+nope(){
+	echo "Usage: press text [num]"
+	exit
+}
+[ $# = 0 ] && nope
+[ $# = 1 ] && xte "str $1" && exit
+re='^[0-9]+$'
+[[ "$2" =~ $re ]] || nope
+i=0
+while [ "$i" -lt "$2" ]
+do
+	xte "str $1"
+	i=$((i + 1))
+done

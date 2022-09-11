@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+import sys
+import urllib.parse
+
+
+def url_encode_all(string):
+    return "".join("%{0:0>2}".format(format(ord(char), "x")) for char in string)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        # stdin
+        for i in sys.stdin:
+            print(urllib.parse.quote_plus(i), end="")
+    elif len(sys.argv) == 2 and sys.argv[1] == "-a":
+        # url encode all chars of stdin
+        stdin = "".join(i for i in sys.stdin)
+        print(url_encode_all(stdin), end="")
+    elif sys.argv[1] == "-a":
+        # url encode all chars of args
+        for i in sys.argv[2:]:
+            print(url_encode_all(i))
+    else:
+        # url encode args
+        for i in sys.argv[1:]:
+            print(urllib.parse.quote_plus(i))

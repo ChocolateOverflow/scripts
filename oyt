@@ -1,0 +1,21 @@
+#!/bin/bash
+# Open URL (or video ID) in YouTube
+
+browser="$BROWSER"
+
+[ $# -eq 0 ] && echo "Usage: $(basename "$0") [YOUTUBE_URL | VIDEO_CODE | FILE_DOWNLOADED_BY_youtube-dl]..."
+
+for arg in "$@"; do
+  if [ -f "$arg" ] && [[ "$arg" =~ \[[A-Za-z0-9_-]{11}\]\.(mkv|mp4|ogg|webm|flv)$ ]]; then
+    # Existing files whose name are in the format: "Video title [11ch-vid-id].webm"
+    "$browser" "https://youtube.com/watch?v=$(echo "$arg" | rev | cut -d[ -f1 | cut -d] -f2 | rev)"
+  elif [[ "$arg" =~ ^[A-Za-z0-9_-]{11}$ ]]; then
+    # video ID
+    "$browser" "https://youtube.com/watch?v=$arg"
+  elif [[ "$arg" =~ ^(https://)?www\.youtube\.com/watch\?v=[A-Za-z0-9_-]{11}(&.*)?$ ]]; then
+    # YouTube URL
+    "$browser" "$arg"
+  else
+    >&2 echo "Invalid file/format: $arg"
+  fi
+done

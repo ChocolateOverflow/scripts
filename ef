@@ -1,0 +1,7 @@
+#!/bin/bash
+# Edit file selected with fzf
+
+file="$(
+  fd --type f --hidden --follow --exclude .git |
+  fzf --preview 'bat --style=numbers --color=always --line-range :60 {}'
+)" && "$EDITOR" "$file"

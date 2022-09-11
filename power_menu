@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# This prompts a power menu for shutdown, reboot, etc.
+
+choice=$(echo -e "\
+0) Do nothing
+1) Lock screen
+2) Shutdown
+3) Restart
+4) Kill graphical\
+" | dmenu -i -l 10 | cut -c 1)
+
+case $choice in
+	1) i3lock -c 000000;;
+	2) shutdown -P now;;
+	3) shutdown -r now;;
+	4) bspc quit;;
+esac
