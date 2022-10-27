@@ -41,8 +41,7 @@ def get_abs_path(file: str) -> Union[str, None]:
 def get_mime_type(file: str) -> str:
     """Get the MIME type of the given file"""
     # TODO: get a library to do this instead of using the system command
-    m = subprocess.check_output([b"file", b"-ib", file.encode()]).decode().split("/")[0]
-    return m
+    return subprocess.check_output([b"file", b"-ib", file.encode()]).decode().split("/")[0]
 
 
 def main(cmd, args):
@@ -57,7 +56,7 @@ def main(cmd, args):
     args = list(set(tmp))
 
     # filter for "text" MIME type
-    for arg in args:
+    for arg in list(args):
         if get_mime_type(arg) != "text":
             print_error(f"{arg} is not a text file")
             args.remove(arg)
@@ -69,7 +68,7 @@ def main(cmd, args):
     elif cmd in cmd2app:
         if len(args) == 0:
             print_error("No file passed")
-            exit()
+            sys.exit()
         cmd_arr = cmd2app[cmd] if isinstance(cmd2app[cmd], list) else [cmd2app[cmd]]
         cmd_arr.extend(args)
         subprocess.call(cmd_arr)

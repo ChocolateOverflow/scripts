@@ -1,10 +1,16 @@
 #!/usr/bin/python3
+"""
+Usage:
+    urlencode [-a] some_string...
+    urlencode [-a] < file
+"""
 import sys
 import urllib.parse
 
 
 def url_encode_all(string):
-    return "".join("%{0:0>2}".format(format(ord(char), "x")) for char in string)
+    """URL-encode *all* characters in a string"""
+    return "".join(f"%{format(ord(char), 'x'):0>2}" for char in string)
 
 
 if __name__ == "__main__":
@@ -14,8 +20,7 @@ if __name__ == "__main__":
             print(urllib.parse.quote_plus(i), end="")
     elif len(sys.argv) == 2 and sys.argv[1] == "-a":
         # url encode all chars of stdin
-        stdin = "".join(i for i in sys.stdin)
-        print(url_encode_all(stdin), end="")
+        print(url_encode_all("".join(i for i in sys.stdin)), end="")
     elif sys.argv[1] == "-a":
         # url encode all chars of args
         for i in sys.argv[2:]:
