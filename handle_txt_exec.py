@@ -33,9 +33,7 @@ def print_error(msg: str) -> None:
 def get_abs_path(file: str) -> Union[str, None]:
     """Gets the real abosulte path (resolving symlinks) of the given file"""
     path = which(file)
-    if path is None:
-        return None
-    return os.path.realpath(path)
+    return os.path.realpath(path) if path is not None else None
 
 
 def get_mime_type(file: str) -> str:
@@ -44,33 +42,38 @@ def get_mime_type(file: str) -> str:
     return subprocess.check_output([b"file", b"-ib", file.encode()]).decode().split("/")[0]
 
 
-def main(cmd, args):
+def filter_files(args: list):
+    """Filter for executable text files (scripts)"""
     # filter for executables & get abs path
-    tmp = []
+    files = set()
     for arg in args:
         abs_path = get_abs_path(arg)
         if abs_path is None:
             print_error(f"{arg} does not exist as an executable")
         else:
-            tmp.append(abs_path)
-    args = list(set(tmp))
+            files.add(abs_path)
 
     # filter for "text" MIME type
-    for arg in list(args):
+    for arg in list(files):
         if get_mime_type(arg) != "text":
             print_error(f"{arg} is not a text file")
-            args.remove(arg)
+            files.remove(arg)
+    return files
 
+
+def main(cmd, args):
+    """MAIN"""
     if cmd == "handle_txt_exec.py":
         # simply print the filtered files line by line
-        for arg in args:
+        for arg in filter_files(args):
             print(arg)
     elif cmd in cmd2app:
-        if len(args) == 0:
+        targets = filter_files(args)
+        if len(targets) == 0:
             print_error("No file passed")
             sys.exit()
         cmd_arr = cmd2app[cmd] if isinstance(cmd2app[cmd], list) else [cmd2app[cmd]]
-        cmd_arr.extend(args)
+        cmd_arr.extend(targets)
         subprocess.call(cmd_arr)
     else:
         print_error(f"Unrecognized command: {cmd}")
