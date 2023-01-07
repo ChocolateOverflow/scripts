@@ -31,7 +31,7 @@ def print_error(msg: str) -> None:
 
 
 def get_abs_path(file: str) -> Union[str, None]:
-    """Gets the real abosulte path (resolving symlinks) of the given file"""
+    """Gets the real absolute path (resolving symlinks) of the given file"""
     path = which(file)
     return os.path.realpath(path) if path is not None else None
 

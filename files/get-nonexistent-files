@@ -35,5 +35,5 @@ case "$cmd" in
       echo "$f"
     done
     ;;
-  ec) $EDITOR "${files[@]}";; # edit files
+  en) $EDITOR "${files[@]}";; # edit files
 esac

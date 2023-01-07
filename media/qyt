@@ -1,0 +1,117 @@
+#!/bin/bash
+# pueue youtube downloads
+
+# TODO: impl arg passing to pueue
+
+dest="$HOME/Downloads"
+group='yt'
+ytdl_bin='yt-dlp'
+color_err="\x1b[31m"  # red
+color_info="\x1b[32m" # green
+color_reset="\x1b[0m"
+
+if ! [ -x "$(command -v pueue)" ]; then
+  echo -e "${color_err}[!] Error: pueue is not installed.${color_reset}" >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v "$ytdl_bin")" ]; then
+  echo -e "${color_err}[!] Error: ${ytdl_bin} is not installed.${color_reset}" >&2
+  exit 1
+fi
+
+# identify type by URL/ID
+get_type() {
+  # matches:
+  # ^https://www.youtube.com/watch\?v=[a-zA-Z0-9_-]{11}$
+  # ^https://www.youtube.com/shorts/[a-zA-Z0-9_-]{11}$
+  # ^[a-zA-Z0-9_-]{11}$
+  if [[ "$1" =~ ^(https://www.youtube.com/(watch\?v=|shorts/))?[a-zA-Z0-9_-]{11}$ ]]; then
+    printf video
+    return 0
+  elif [[ "$1" =~ ^https://www.youtube.com/playlist\?list=[a-zA-Z0-9_-]{11} ]]; then
+    printf playlist
+    return 0
+  fi
+
+  return 1 # matches nothing
+}
+
+# enqueue a single video
+video() {
+  pueue add -g "$group" -w "$dest" -- "$ytdl_bin" --no-playlist "$1" && echo -e "${color_info}[+] Enqueued video:${color_reset} $1" >&2
+}
+
+# enqueue a playlist, optionally with indices
+playlist() {
+  # space-separated arguments for optional playlist indices
+  read -r url idx <<< "$1"
+  format="%(playlist_title)s [%(playlist_id)s]/%(playlist_index)s. %(title)s [%(id)s].%(ext)s"
+  if [ "$idx" = "" ]; then
+    # no indices
+    pueue add -g "$group" -w "$dest" -e -- "$ytdl_bin" -o "$format" "$url" && echo -e "${color_info}[+] Enqueued whole playlist:${color_reset} ${url}" >&2
+  else
+    # with indices
+    pueue add -g "$group" -w "$dest" -e -- "$ytdl_bin" -o "$format" "$url" -I "$idx" && echo -e "${color_info}[+] Enqueued playlist${color_reset} ${url} @ indices ${idx}" >&2
+  fi
+}
+
+# enqueue input based on its type
+enqueue() {
+  case "$(get_type "$1")" in
+  video) video "$@" ;;
+  playlist) playlist "$@" ;;
+  *) echo -e "${color_err}[!] Invalid URL:${color_reset} $1" >&2 && return 1 ;;
+  esac
+  return 0
+}
+
+# pause the group
+pause() {
+  pueue pause --wait -g "$group"
+}
+
+# resume the group
+resume() {
+  pueue start -g "$group"
+}
+
+### main() ###
+if [ $# -eq 0 ]; then
+  # No arg -> read from stdin
+  prev=
+  while read -r input; do
+
+    # short commands
+    case "$input" in
+    "q") exit 0 ;;
+    "p") pause && continue ;;
+    "y") resume && continue ;;
+    "s") pueue status && continue ;;
+    "") input="$(xclip -o)" ;; # Get URL from clipboard
+    esac
+
+    # check duplicate
+    if [ "$input" = "$prev" ]; then
+      echo -e "${color_err}[!] Ignoring duplicate input${color_reset}" >&2
+      continue
+    fi
+
+    enqueue "$input"
+    prev="$input"
+  done
+else
+  case "$1" in
+  "p") pause && shift ;;  # pause the group and add the rest
+  "s") resume && shift ;; # resume the group and add the rest
+  esac
+
+  # enqueue args & return with the number of failures
+  fails=0
+  for arg in "$@"; do
+    enqueue "$arg"
+    fails=$((fails + $?))
+  done
+
+  exit "$fails"
+fi

@@ -1,0 +1,4 @@
+#!/bin/bash
+for torrent in "$@"; do
+  transmission-remote -N -a "$torrent"
+done

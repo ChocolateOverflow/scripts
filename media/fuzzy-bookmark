@@ -1,0 +1,3 @@
+#!/bin/bash
+# fzf + buku
+buku -o "$(buku -p -j | jq -r '.[] | (.index|tostring) + "> " + .title + ": " + .description' | grep -P '^\d+>' | fzf | cut -d'>' -f1)"

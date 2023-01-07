@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+"""Turn some common non-ascii characters into ascii equivalent"""
+
+import sys
+from unidecode import unidecode
+
+
+if len(sys.argv) == 1:
+    for line in sys.stdin:
+        print(unidecode(line), end="")
+else:
+    for i in sys.argv[1:]:
+        print(unidecode(i), end="")
