@@ -1,7 +1,7 @@
 #!/bin/bash
 
 main_monitor="$(xrandr -q | grep "\sconnected" | cut -d' ' -f1 | grep -v LVDS | head -n 1)"
-new_monitor=$(xrandr -q | grep "\sconnected" | cut -d' ' -f1 | dmenu -i -p "Select monitor")
+new_monitor=$(xrandr -q | grep "\sconnected" | cut -d' ' -f1 | rofi -dmenu -p "Select monitor")
 
 if [[ "$main_monitor" != "$new_monitor" ]]; then
 	notify-send 'Casting'

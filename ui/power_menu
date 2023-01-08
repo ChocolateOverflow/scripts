@@ -8,7 +8,7 @@ choice=$(echo -e "\
 2) Shutdown
 3) Restart
 4) Kill graphical\
-" | dmenu -i -l 10 | cut -c 1)
+" | rofi -dmenu -l 5 -theme-str 'window {width: 15%;}' -p 'POWER' | cut -c 1)
 
 case $choice in
 	1) i3lock -c 000000;;
