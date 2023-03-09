@@ -1,0 +1,11 @@
+#!/bin/bash
+# Fuzzy-search and open bookmarks
+
+buku -o "$(
+  buku --nostdin -p -j |
+  jq -r '.[] | (.index|tostring) + "> " + .title + ": " + .description + " [" + .tags + "]"' |
+  grep -P '^\d+>' |
+  rofi -dmenu -i -no-levenshtein-sort -matching prefix \
+    -theme-str 'window {width: 100%; height: 70%;}' -p '> ' -mesg 'Bookmarks' |
+  cut -d'>' -f1
+)"

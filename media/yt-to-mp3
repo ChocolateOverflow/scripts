@@ -1,65 +1,56 @@
-#!/usr/bin/python3
-"""
-Given a list of YouTube URLs and their final names, download them as MP3,
-rename them, and edit their eyeD3 data
+#!/bin/bash
 
-The file given as the only argument is in the following format
-(empty lines are optional and ignored)
+# File format:
+#
+# .u URL        <- set source URL
+# .t TITLE      <- set title
+# .a ARTIST     <- set artist (optional)
+# .dl           <- start/queue download with set parameters
+#
+# Note: u, t, and a need a space after each. dl doesn't
 
-```
-https://url1/
-Title 1
-# comment
-# another comment
+group='music'
+dest="$HOME/Downloads/music"
+curr=0
+url=
+title=
+artist=
 
-https://url2/
-Title 2
-```
-"""
+if [ $# -ne 1 ]; then
+  echo "Usage: yt-to-mp3 SONGS_FILE" >&2
+  exit 1
+fi
 
-from dataclasses import dataclass
-import sys
-import subprocess
-from typing import List
+if [ ! -e "$1" ]; then
+  echo "[!] File '$1' does not exist" >&2
+  exit 1
+fi
 
-YOUTUBE_DL_BIN = "/usr/bin/yt-dlp"
-ID3_CMD = "id3"
-ydl_opts = ["--no-playlist", "--extract-audio", "--audio-format", "mp3"]
+while read -r line; do
+  ((curr += 1))
+  if [[ "$line" =~ ^".u ".* ]]; then
+    url="$(echo "$line" | cut -c 4-)"
+  elif [[ "$line" =~ ^".t ".* ]]; then
+    title="$(echo "$line" | cut -c 4- | esc_sh )"
+  elif [[ "$line" =~ ^".a ".* ]]; then
+    artist="$(echo "$line" | cut -c 4- | esc_sh )"
+  elif [[ "$line" =~ ^".dl" ]]; then
+    if [ "$url" = "" ] || [ "$title" = "" ]; then
+      echo "[!] Error on line ${curr}:" >&2
+      echo "[!] Missing URL or title" >&2
+      exit 1
+    elif [ "$artist" = "" ]; then
+      pueue add -g "$group" -w "$dest" -- dl-song "'$url'" "$title" && echo "Enqueued: ${title}"
+    else
+      pueue add -g "$group" -w "$dest" -- dl-song "'$url'" "$title" "$artist" && echo "Enqueued: ${title}"
+      artist=
+    fi
+    url=
+    title=
+  fi
+done < "$1"
 
-
-@dataclass
-class Target:
-    """A URL and file name pair"""
-
-    url: str
-    filename: str
-
-
-def get_targets_from_file(file: str) -> List[Target]:
-    """Get targets (URL & file names) from a text file"""
-    targets = []
-    with open(file, "r", encoding="utf8") as _f:
-        lines = [
-            line.strip()
-            for line in _f.readlines()
-            if not line.isspace() and not line.startswith("#")
-        ]
-    for i in range(0, len(lines), 2):
-        targets.append(Target(lines[i], lines[i + 1]))
-    return targets
-
-
-def download_targets(targets: List[Target]) -> None:
-    """Download, rename, and edit the eyeD3 data of targets"""
-    for target in targets:
-        print(f'[*] Downloading "{target.filename}" from "{target.url}"')
-        args = [YOUTUBE_DL_BIN]
-        args.append(target.url)
-        args.extend(ydl_opts)
-        args.extend(["--output", f"{target.filename}.%(ext)s"])
-        subprocess.call(args)
-        subprocess.call([ID3_CMD, f"{target.filename}.mp3"])
-
-
-if __name__ == "__main__":
-    download_targets(get_targets_from_file(sys.argv[1]))
+if [ "${url}" != "" ]; then
+  echo '[!] Did you forget a ".dl" before EOF?' >&2
+  exit 1
+fi

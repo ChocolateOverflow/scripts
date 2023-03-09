@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 cd /tmp || exit
 wget 'https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage'
 mv nvim.appimage ~/.local/bin/nvim

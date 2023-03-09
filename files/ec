@@ -1,3 +1,1 @@
-#!/bin/bash
-# Edit config file selected with fzf
-file="$(fd --type f --hidden --follow --exclude .git . ~/git/dotfiles/config ~/git/dotfiles/home | fzf --preview 'bat --style=numbers --color=always --line-range :60 {}')" && "$EDITOR" "$file"
+get-nonexistent-files

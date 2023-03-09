@@ -1,0 +1,26 @@
+#!/bin/bash
+
+url="$1"
+title="$2"
+artist="$3"
+src_cmt="$(echo "${url}" | cut -d '?' -f 2-):src"
+
+if [ $# -eq 3 ]; then
+  filename="${title} - ${artist}"
+elif [ $# -eq 2 ]; then
+  filename="$title"
+else
+  echo "Usage: dl-song URL TITLE [ARTIST]" >&2
+  exit 1
+fi
+
+# translate bad characters
+filename="$(echo "$filename" | tr '<>:/\|?*' '_' | tr '"' "'")"
+
+yt-dlp --no-playlist --extract-audio --audio-format mp3 "$url" -o "${filename}.mp3"
+
+if [ $# -eq 3 ]; then
+  eyeD3 "${filename}.mp3" -t "$title" -a "$artist" --add-comment "$src_cmt"
+else
+  eyeD3 "${filename}.mp3" -t "$title" --add-comment "$src_cmt"
+fi

@@ -1,0 +1,3 @@
+#!/bin/bash
+# escape special characters from stdin to something reusable in another shell cmd
+printf "%q" "$(cat)"

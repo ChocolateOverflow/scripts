@@ -1,2 +1,4 @@
 #!/bin/bash
+# Escape every char with a backslash
+# https://stackoverflow.com/a/20053121/11249290
 sed -e 's/./\\&/g; 1{$s/^$/""/}; 1!s/^/"/; $!s/$/"/'

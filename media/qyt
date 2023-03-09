@@ -26,7 +26,7 @@ get_type() {
   # ^https://www.youtube.com/watch\?v=[a-zA-Z0-9_-]{11}$
   # ^https://www.youtube.com/shorts/[a-zA-Z0-9_-]{11}$
   # ^[a-zA-Z0-9_-]{11}$
-  if [[ "$1" =~ ^(https://www.youtube.com/(watch\?v=|shorts/))?[a-zA-Z0-9_-]{11}$ ]]; then
+  if [[ "$1" =~ ^(https://www.youtube.com/(watch\?v=|shorts/))?[a-zA-Z0-9_-]{11} ]]; then
     printf video
     return 0
   elif [[ "$1" =~ ^https://www.youtube.com/playlist\?list=[a-zA-Z0-9_-]{11} ]]; then
@@ -76,6 +76,16 @@ resume() {
   pueue start -g "$group"
 }
 
+# restart failed tasks in place
+restart() {
+  pueue restart -g "$group" -i
+}
+
+# clear all successfully finished tasks
+clean() {
+  pueue clean -g "$group" -s
+}
+
 ### main() ###
 if [ $# -eq 0 ]; then
   # No arg -> read from stdin
@@ -86,7 +96,9 @@ if [ $# -eq 0 ]; then
     case "$input" in
     "q") exit 0 ;;
     "p") pause && continue ;;
-    "y") resume && continue ;;
+    "R") resume && continue ;;
+    "r") restart && continue ;;
+    "c") clean && continue ;;
     "s") pueue status && continue ;;
     "") input="$(xclip -o)" ;; # Get URL from clipboard
     esac
@@ -103,7 +115,7 @@ if [ $# -eq 0 ]; then
 else
   case "$1" in
   "p") pause && shift ;;  # pause the group and add the rest
-  "s") resume && shift ;; # resume the group and add the rest
+  "r") resume && shift ;; # resume the group and add the rest
   esac
 
   # enqueue args & return with the number of failures
