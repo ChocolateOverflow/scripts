@@ -1,9 +1,11 @@
 #!/bin/bash
 
+set -e
+
 url="$1"
 title="$2"
 artist="$3"
-src_cmt="$(echo "${url}" | cut -d '?' -f 2-):src"
+src_cmt="$(echo "$url" | sed -r 's|https?://||'):src"
 
 if [ $# -eq 3 ]; then
   filename="${title} - ${artist}"

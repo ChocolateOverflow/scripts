@@ -8,7 +8,7 @@ case "$1" in
 		setsid -f mpv -quiet "$1" >/dev/null 2>&1 ;;
 	*png|*jpg|*jpe|*jpeg|*gif)
 		curl -sL "$1" > "/tmp/$(echo "$1" | sed "s/.*\///")" && sxiv -a "/tmp/$(echo "$1" | sed "s/.*\///")"  >/dev/null 2>&1 & ;;
-	*mp3|*flac|*opus|*mp3?source*)
+	*mp3|*flac|*opus|*mp3?*)
 		setsid -f pueue add -- curl -LO "$1" >/dev/null 2>&1 ;;
   magnet:?*)
     transmission-remote -a "$1" && notify-send "Added magnet: $(echo "$1" | grep -oP '(?<=&dn=).+?(?=(&|$))' | urldecode)";;

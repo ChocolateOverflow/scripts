@@ -39,7 +39,8 @@ get_type() {
 
 # enqueue a single video
 video() {
-  pueue add -g "$group" -w "$dest" -- "$ytdl_bin" --no-playlist "$1" && echo -e "${color_info}[+] Enqueued video:${color_reset} $1" >&2
+  url="${1%\&*}" # Everything after the 1st `&` is trimmed off
+  pueue add -g "$group" -w "$dest" -- "$ytdl_bin" --no-playlist "$url" && echo -e "${color_info}[+] Enqueued video:${color_reset} ${url}" >&2
 }
 
 # enqueue a playlist, optionally with indices
