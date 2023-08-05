@@ -31,9 +31,9 @@ while read -r line; do
   if [[ "$line" =~ ^".u ".* ]]; then
     url="$(echo "$line" | cut -c 4-)"
   elif [[ "$line" =~ ^".t ".* ]]; then
-    title="$(echo "$line" | cut -c 4- | esc_sh )"
+    title="$(echo "$line" | cut -c 4- | esc-sh )"
   elif [[ "$line" =~ ^".a ".* ]]; then
-    artist="$(echo "$line" | cut -c 4- | esc_sh )"
+    artist="$(echo "$line" | cut -c 4- | esc-sh )"
   elif [[ "$line" =~ ^".dl" ]]; then
     if [ "$url" = "" ] || [ "$title" = "" ]; then
       echo "[!] Error on line ${curr}:" >&2
@@ -42,7 +42,7 @@ while read -r line; do
     elif [ "$artist" = "" ]; then
       pueue add -g "$group" -w "$dest" -- dl-song "'$url'" "$title" && echo "Enqueued: ${title}"
     else
-      pueue add -g "$group" -w "$dest" -- dl-song "'$url'" "$title" "$artist" && echo "Enqueued: ${title}"
+      pueue add -g "$group" -w "$dest" -- dl-song "'$url'" "$title" "$artist" && echo "Enqueued: ${title} - ${artist}"
       artist=
     fi
     url=

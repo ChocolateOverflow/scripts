@@ -4,8 +4,8 @@ Given some arguments, this script filters out non-executables as well as file
 whose MIME types are not text. It then runs one of the defined commands on
 the remaining text executables.
 
-Usage: symlink `handle_txt_exec` (shell aliases won't work) and add the name
-of that symlink to `cmd2app`, telling `handle_txt_exec` what command to run
+Usage: symlink `handle-txt-exec.py` (shell aliases won't work) and add the name
+of that symlink to `cmd2app`, telling `handle-txt-exec` what command to run
 for that symlink. Each member value of `cmd2app` can be either a single string
 or a list of arguments.
 """
@@ -63,7 +63,7 @@ def filter_files(args: list):
 
 def main(cmd, args):
     """MAIN"""
-    if cmd == "handle_txt_exec.py":
+    if cmd == "handle-txt-exec.py":
         # simply print the filtered files line by line
         for arg in filter_files(args):
             print(arg)

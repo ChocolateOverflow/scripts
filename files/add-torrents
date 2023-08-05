@@ -1,4 +1,11 @@
 #!/bin/bash
-for torrent in "$@"; do
-  transmission-remote -N -a "$torrent"
-done
+
+if [ $# -eq 0 ]; then
+  while read -r torrent; do
+    transmission-remote -N -a "$torrent"
+  done
+else
+  for torrent in "$@"; do
+    transmission-remote -N -a "$torrent"
+  done
+fi

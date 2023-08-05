@@ -4,7 +4,7 @@ main_monitor="$(xrandr -q | grep "\sconnected" | cut -d' ' -f1 | grep -v LVDS | 
 new_monitor=$(xrandr -q | grep "\sconnected" | cut -d' ' -f1 | rofi -dmenu -p "Select monitor")
 
 if [[ "$main_monitor" != "$new_monitor" ]]; then
-	notify-send 'Casting'
+	notify-send "Casting to ${new_monitor}"
 	xrandr --output "$new_monitor" --same-as "$main_monitor"
 else
 	notify-send 'Resetting main monitor'
