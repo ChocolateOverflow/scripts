@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ddcutil setvcp --disable-dynamic-sleep 12 --display 1 $@ || echo "failed to set contrast" >&2

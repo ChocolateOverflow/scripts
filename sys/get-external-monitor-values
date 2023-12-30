@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ddcutil getvcp 10 --display 1
+ddcutil getvcp 12 --display 1
