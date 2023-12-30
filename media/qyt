@@ -87,6 +87,11 @@ clean() {
   pueue clean -g "$group" -s
 }
 
+# clear all successfully finished tasks
+clean_all() {
+  pueue clean -s
+}
+
 ### main() ###
 if [ $# -eq 0 ]; then
   # No arg -> read from stdin
@@ -100,6 +105,7 @@ if [ $# -eq 0 ]; then
     "R") resume && continue ;;
     "r") restart && continue ;;
     "c") clean && continue ;;
+    "C") clean_all && continue ;;
     "s") pueue status && continue ;;
     "") input="$(xclip -o)" ;; # Get URL from clipboard
     esac
