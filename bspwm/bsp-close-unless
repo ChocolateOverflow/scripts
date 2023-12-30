@@ -1,0 +1,4 @@
+#!/bin/sh
+
+name="$(xdotool getwindowfocus getwindowname | awk -F' - ' '{ print $NF }')"
+[ "$name" = "NVIM" ] || bspc node -c
