@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rustup update
+cargo install-update -a
+
+pipx upgrade-all
+
+npm -g update

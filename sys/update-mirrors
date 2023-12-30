@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -e
+mirrors=20
+
+curl 'https://archlinux.org/mirrorlist/all/https/' | sed 's/#Server/Server/' > /tmp/mirrorlist.bak
+
+echo "Ranking $mirrors mirrors"
+{ time rankmirrors -n $mirrors /tmp/mirrorlist.bak; } \
+  | grep https > /tmp/mirrorlist \
+  && notify-send "Finished ranking mirrors. Enter sudo password"
+
+sudo mv /tmp/mirrorlist /tmp/mirrorlist.bak /etc/pacman.d/
