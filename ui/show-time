@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+# Call this script with no argument, and it will call itself with a terminal
+#
+# Hacky recursion because I can't easily pass all the commands directly to alacritty and
+# accidentally running the script directly in a terminal would make it float which is annoying
+
+if [ $# -eq 0 ]; then
+  alacritty -e "$0" 1 &
+else
+  bspc node focused -t \~floating # make window float
+  # TODO: "Wednesday" pushes last time off the terminal
+  date '+%D%n%A%n%T' | toilet -f mono12
+  read -n 1 -s -r # press any key to close
+fi
