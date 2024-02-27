@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $# -gt 1 ]; then
+  echo 'Too many arguments' >&2
+  echo "Usage: $(basename $) [vm_name]" >&2
+  exit 127
+fi
+
+if [ "$1" = "" ]; then
+  vm="$(VBoxManage list vms | rofi -dmenu -p 'Launch VM' | cut -d '"' -f2)"
+else
+  vm="$1"
+fi
+
+if [ "$vm" = "" ]; then
+  echo 'No VM selected' >&2
+  exit 127
+fi
+
+VBoxManage startvm "$vm"
