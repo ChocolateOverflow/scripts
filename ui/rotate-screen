@@ -5,7 +5,8 @@ if [[ $# -eq 0 ]]; then
 0) normal
 1) left
 2) right
-" | rofi -dmenu -l 3 -theme-str 'window {width: 15%;}' -p "[$(hostname)] Rotate screen" | cut -d ' ' -f 2)
+3) inverted
+" | rofi -dmenu -l 4 -theme-str 'window {width: 15%;}' -p "[$(hostname)] Rotate screen" | cut -d ' ' -f 2)
 elif [[ $# -eq 1 ]]; then
   orientation="$1"
 else
