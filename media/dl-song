@@ -5,24 +5,32 @@ set -e
 url="$1"
 title="$2"
 artist="$3"
+album="$4"
+tracknum="$5"
+album_artist=
 src_cmt="$(echo "$url" | sed -r 's|https?://||'):src"
 
-if [ $# -eq 3 ]; then
-  filename="${title} - ${artist}"
-elif [ $# -eq 2 ]; then
-  filename="$title"
-else
+if [ "$url" = "" ] || [ "$title" = "" ]; then
   echo "Usage: dl-song URL TITLE [ARTIST]" >&2
   exit 1
+elif [ "$artist" = "" ]; then
+  filename="$title"
+else
+  filename="${title} - ${artist}"
 fi
 
 # translate bad characters
 filename="$(echo "$filename" | tr '<>:/\|?*' '_' | tr '"' "'")"
 
+if [ "$tracknum" = "" ]; then
+  tracknum=0
+fi
+
+if [ "$album" != "" ] && [ "$artist" != "" ]; then
+  album_artist="$artist"
+fi
+
+
 yt-dlp --no-playlist --extract-audio --audio-format mp3 "$url" -o "${filename}.mp3"
 
-if [ $# -eq 3 ]; then
-  eyeD3 "${filename}.mp3" -t "$title" -a "$artist" --add-comment "$src_cmt"
-else
-  eyeD3 "${filename}.mp3" -t "$title" --add-comment "$src_cmt"
-fi
+eyeD3 "${filename}.mp3" -t "$title" -a "$artist" -A "$album" -b "$album_artist" -n "$tracknum" --add-comment "$src_cmt"
