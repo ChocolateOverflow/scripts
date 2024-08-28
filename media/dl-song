@@ -2,17 +2,33 @@
 
 set -e
 
-url="$1"
-title="$2"
-artist="$3"
-album="$4"
-tracknum="$5"
-album_artist=
+print_help() {
+  echo -e "Usage: $(basename "$0") -u=URL -t=TITLE [-a=ARTIST] [-A=ALBUM] [-n=TRACKNUM] [-b=ALBUM_ARTIST]" >&2
+  return 1
+}
+
+url=""
+title=""
+artist=""
+album=""
+tracknum=0
+album_artist=""
+
+for i in "$@"; do
+  case "$i" in
+  -u=*) url="${i#*=}" ;;
+  -t=*) title="${i#*=}" ;;
+  -a=*) artist="${i#*=}" ;;
+  -A=*) album="${i#*=}" ;;
+  -n=*) tracknum="${i#*=}" ;;
+  -b=*) album_artist="${i#*=}" ;;
+  *) print_help ;;
+  esac
+done
 src_cmt="$(echo "$url" | sed -r 's|https?://||'):src"
 
 if [ "$url" = "" ] || [ "$title" = "" ]; then
-  echo "Usage: dl-song URL TITLE [ARTIST]" >&2
-  exit 1
+  print_help
 elif [ "$artist" = "" ]; then
   filename="$title"
 else
@@ -26,10 +42,9 @@ if [ "$tracknum" = "" ]; then
   tracknum=0
 fi
 
-if [ "$album" != "" ] && [ "$artist" != "" ]; then
+if [ "$album_artist" = "" ] && [ "$album" != "" ] && [ "$artist" != "" ]; then
   album_artist="$artist"
 fi
-
 
 yt-dlp --no-playlist --extract-audio --audio-format mp3 "$url" -o "${filename}.mp3"
 
