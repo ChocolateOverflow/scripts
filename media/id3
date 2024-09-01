@@ -6,20 +6,20 @@ import eyed3
 
 def retag_from_filename(files: list[str]) -> None:
     for file in files:
-        if file.endswith(".mp3"):
-            try:
-                _f = eyed3.load(file)
-                arr = file[:-4].split(" - ")
-                if len(arr) > 1:
-                    _f.tag.artist = arr[-1]
-                else:
-                    print(f"[!] File {file} doesn't have an artist", file=sys.stderr)
-                _f.tag.title = " - ".join(arr[:-1])
-                _f.tag.save()
-            except Exception as _e:
-                print(f"[!] File {file} couldn't be retagged: {str(_e)}", file=sys.stderr)
-        else:
+        if not file.endswith(".mp3"):
             print(f"[!] File {file} is not an mp3 file", file=sys.stderr)
+            continue
+        try:
+            _f = eyed3.load(file)
+            arr = file[:-4].split(" - ")
+            if len(arr) > 1:
+                _f.tag.artist = arr[-1]
+            else:
+                print(f"[!] File {file} doesn't have an artist", file=sys.stderr)
+            _f.tag.title = " - ".join(arr[:-1])
+            _f.tag.save()
+        except Exception as _e:
+            print(f"[!] File {file} couldn't be retagged: {str(_e)}", file=sys.stderr)
 
 
 if __name__ == "__main__":
