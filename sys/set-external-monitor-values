@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set-brightness-external-monitor "$@"
+set-contrast-external-monitor "$@"
