@@ -1,0 +1,23 @@
+#!/bin/bash
+# Fix URL text frames messed up by audacity
+
+set -eu
+
+issues=""
+
+for f in "$@"; do
+  url="$(eyeD3 "$f" | grep -E '^https://.*$' | uniq)"
+  if [ "$(echo "$url" | wc -l)" -gt 1 ]; then
+    issue="[!] Multiple URLs detected in: $f" >&2
+    issues="$issues\n$issue"
+    continue
+  fi
+  if [ "$url" != "" ]; then
+    eyeD3 "$f" --user-text-frame "TXXX:" --url-frame "WOAS:$url" --user-text-frame "URL:$url"
+  fi
+done
+
+if [ "$issues" != "" ]; then
+  echo "$issues" >&2
+  exit 1
+fi
