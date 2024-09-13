@@ -5,7 +5,19 @@ set -eu
 
 issues=""
 
+# Single file with URL provided
+if [ $# -eq 2 ] && [[ "$1" =~ .*\.mp3$ ]] && [[ "$2" =~ ^https://.*$ ]]; then
+  eyeD3 "$1" --user-text-frame "TXXX:" --url-frame "WOAS:$2" --user-text-frame "URL:$2"
+  exit 0
+fi
+
+# Multiple files, based on the URL in their current TXXX frames
 for f in "$@"; do
+  if ! [[ "$f" =~ .*\.mp3$ ]]; then
+    issue="[!] Not an mp3 file: $f" >&2
+    issues="$issues\n$issue"
+    continue
+  fi
   url="$(eyeD3 "$f" | grep -E '^https://.*$' | uniq)"
   if [ "$(echo "$url" | wc -l)" -gt 1 ]; then
     issue="[!] Multiple URLs detected in: $f" >&2
