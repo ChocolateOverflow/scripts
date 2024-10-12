@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# need to use ddcutil instead of xbacklight like from /usr/share/doc/xss-lock/dim-screen.sh when using external monitor
+# ddcutil is also slow, unfortunately
+
+min_brightness=0
+
+get_brightness() {
+  ddcutil getvcp 10 --display 1 -t | cut -d' ' -f4
+}
+
+set_brightness() {
+  ddcutil setvcp --disable-dynamic-sleep 10 --display 1 "$1"
+}
+
+trap 'exit 0' TERM INT
+trap "set_brightness $(get_brightness); kill %%" EXIT
+set_brightness $min_brightness
+sleep 2147483647 &
+wait

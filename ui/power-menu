@@ -11,7 +11,7 @@ choice=$(echo -e "\
 " | rofi -dmenu -l 5 -theme-str 'window {width: 15%;}' -p "[$(hostname)] POWER" | cut -c 1)
 
 case $choice in
-	1) i3lock -c 000000;;
+	1) lock-screen;;
 	2) shutdown -P now;;
 	3) shutdown -r now;;
 	4) bspc quit;;
