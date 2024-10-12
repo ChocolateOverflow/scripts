@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+url="$1"
+lang="$2"
+
+if [ "$lang" = "" ]; then
+  lang="$(yt-dlp 'https://www.youtube.com/watch?v=rLfzO7Sbdc4' --print subtitles_table | grep '^en' | fzf | cut -d ' ' -f1)"
+fi
+
+yt-dlp "$url" --skip-download --write-subs --sub-langs "$lang"
